@@ -1,0 +1,22 @@
+# Binaries
+/server
+*.exe
+
+# Environment files (never commit secrets)
+.env
+
+# Go build cache
+/vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Test coverage
+coverage.out
+coverage.html
+
+# OS
+.DS_Store
+Thumbs.db
