@@ -5,7 +5,8 @@ const state = {
     totalPages: 1,
     totalUsers: 0,
     isEditing: false,
-    editingUserId: null
+    editingUserId: null,
+    deleteUserCandidateId: null
 };
 
 // DOM ELEMENTS
@@ -27,7 +28,12 @@ const dom = {
     apiStatusWidget: document.getElementById('api-status-widget'),
     toastContainer: document.getElementById('toast-container'),
     nameError: document.getElementById('name-error'),
-    dobError: document.getElementById('dob-error')
+    dobError: document.getElementById('dob-error'),
+    deleteModalBackdrop: document.getElementById('delete-modal-backdrop'),
+    deleteModalClose: document.getElementById('delete-modal-close'),
+    deleteModalCancel: document.getElementById('delete-modal-cancel'),
+    deleteModalConfirm: document.getElementById('delete-modal-confirm'),
+    deleteModalUser: document.getElementById('delete-modal-user')
 };
 
 // INITIALIZATION
@@ -64,6 +70,15 @@ function setupEventListeners() {
         if (state.currentPage < state.totalPages) {
             state.currentPage++;
             loadUsers();
+        }
+    });
+
+    dom.deleteModalCancel.addEventListener('click', closeDeleteModal);
+    dom.deleteModalClose.addEventListener('click', closeDeleteModal);
+    dom.deleteModalConfirm.addEventListener('click', confirmDeleteUser);
+    dom.deleteModalBackdrop.addEventListener('click', (event) => {
+        if (event.target === dom.deleteModalBackdrop) {
+            closeDeleteModal();
         }
     });
 }
@@ -178,7 +193,7 @@ function renderUsersTable(users) {
                     <button class="btn-icon btn-icon-edit" onclick="initiateEditUser(${user.id}, '${escapeQuote(user.name)}', '${user.dob.split('T')[0]}')" title="Edit Profile">
                         <i class="fa-solid fa-pen"></i>
                     </button>
-                    <button class="btn-icon btn-icon-delete" onclick="handleDeleteUser(${user.id})" title="Delete User">
+                    <button class="btn-icon btn-icon-delete" onclick="handleDeleteUser(${user.id}, '${escapeQuote(user.name)}')" title="Delete User">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
                 </div>
@@ -280,19 +295,39 @@ window.initiateEditUser = function(id, name, dob) {
 };
 
 // DELETE USER HANDLER
-window.handleDeleteUser = async function(id) {
-    if (!confirm('Are you sure you want to delete this user from the registry?')) return;
-    
+window.handleDeleteUser = function(id, name) {
+    openDeleteModal(id, name);
+};
+
+window.confirmDeleteUser = async function() {
+    if (!state.deleteUserCandidateId) return;
+    const id = state.deleteUserCandidateId;
+    closeDeleteModal();
+
     try {
         const res = await fetch(`/users/${id}`, { method: 'DELETE' });
         if (!res.ok) throw new Error('Failed to delete user');
-        
+
         showToast('User deleted successfully!', 'success');
         loadUsers();
     } catch (err) {
         showToast(err.message, 'error');
     }
 };
+
+function openDeleteModal(id, name) {
+    state.deleteUserCandidateId = id;
+    dom.deleteModalUser.textContent = escapeHTML(name);
+    dom.deleteModalBackdrop.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    dom.deleteModalConfirm.focus();
+}
+
+function closeDeleteModal() {
+    state.deleteUserCandidateId = null;
+    dom.deleteModalBackdrop.classList.add('hidden');
+    document.body.style.overflow = '';
+}
 
 // RESET FORM STATE
 function resetForm() {

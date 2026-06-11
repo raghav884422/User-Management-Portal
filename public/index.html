@@ -137,6 +137,26 @@
     <!-- TOAST NOTIFICATIONS -->
     <div class="toast-container" id="toast-container"></div>
 
+    <!-- DELETE CONFIRMATION MODAL -->
+    <div class="modal-backdrop hidden" id="delete-modal-backdrop">
+        <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+            <div class="modal-topbar">
+                <div>
+                    <p class="modal-eyebrow">Delete Confirmation</p>
+                    <h3 id="delete-modal-title">Remove user from registry?</h3>
+                </div>
+                <button class="modal-close" id="delete-modal-close" aria-label="Close modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <p class="modal-copy">This action cannot be undone. Are you sure you want to permanently delete <strong id="delete-modal-user"></strong> from the registry?</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="delete-modal-cancel">Cancel</button>
+                <button class="btn btn-primary" id="delete-modal-confirm">Delete user</button>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>
